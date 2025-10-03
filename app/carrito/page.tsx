@@ -17,11 +17,11 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-background">
         <ClientHeader />
-        <main className="container py-8">
+        <main className="px-8 py-8">
           <div className="flex flex-col items-center justify-center py-12 gap-4">
             <ShoppingBag className="h-16 w-16 text-muted-foreground" />
-            <h2 className="text-2xl font-bold">Tu carrito está vacío</h2>
-            <p className="text-muted-foreground">Agrega productos desde el catálogo</p>
+            <h2 className="text-xl md:text-2xl font-bold">Tu carrito está vacío</h2>
+            <p className="text-sm md:text-base text-muted-foreground">Agrega productos desde el catálogo</p>
             <Button asChild>
               <Link href="/catalogo">Ver Catálogo</Link>
             </Button>
@@ -34,10 +34,10 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-background">
       <ClientHeader />
-      <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Carrito de Compras</h1>
-          <p className="text-muted-foreground">{totalItems} productos en tu carrito</p>
+      <main className="px-8 py-8">
+        <div className="mb-6">
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Carrito de Compras</h1>
+          <p className="text-sm md:text-base text-muted-foreground">{totalItems} productos en tu carrito</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">

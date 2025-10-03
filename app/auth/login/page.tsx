@@ -61,6 +61,7 @@ export default function LoginPage() {
                 alt="Pedidos360 Logo"
                 width={200}
                 height={80}
+                className="h-auto w-48 object-contain"
                 priority
               />
             </div>
@@ -99,3 +100,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

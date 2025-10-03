@@ -48,10 +48,10 @@ export default async function CatalogPage({
   return (
     <div className="min-h-screen bg-background">
       <ClientHeader />
-      <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Catálogo de Productos</h1>
-          <p className="text-muted-foreground">Explora nuestros productos y agrega al carrito</p>
+      <main className="px-8 py-8">
+        <div className="mb-6">
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Catálogo de Productos</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Explora nuestros productos y agrega al carrito</p>
         </div>
 
         <div className="mb-6 flex flex-col sm:flex-row gap-4">

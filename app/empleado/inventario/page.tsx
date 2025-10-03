@@ -57,11 +57,11 @@ export default async function EmployeeInventoryPage({
   return (
     <div className="min-h-screen bg-background">
       <EmployeeHeader />
-      <main className="container py-8">
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <main className="container px-8 py-8">
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Gestión de Inventario</h1>
-            <p className="text-muted-foreground">Administra productos y stock</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">Gestión de Inventario</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Administra productos y stock</p>
           </div>
           <ProductFormDialog mode="create" />
         </div>
