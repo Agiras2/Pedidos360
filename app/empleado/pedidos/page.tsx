@@ -33,57 +33,79 @@ export default async function EmployeeOrdersPage({
   const supabase = await createClient()
   const params = await searchParams
 
+  // Usuario autenticado
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) {
-    redirect("/auth/login")
-  }
+  if (!user) redirect("/auth/login")
 
-  // Check if user is employee
-  const { data: userData } = await supabase.from("users").select("role").eq("id", user.id).single()
+  // Verificar rol empleado
+  const { data: userData } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", user.id)
+    .single()
 
-  if (userData?.role !== "employee") {
-    redirect("/catalogo")
-  }
+  if (userData?.role !== "employee") redirect("/catalogo")
 
-  // Fetch orders with filters
+  // Consulta de pedidos con join explícito al usuario
   let query = supabase
     .from("orders")
-    .select("*, users(name, phone), order_items(*, products(name))")
+    .select(`
+      id,
+      status,
+      total,
+      payment_method,
+      delivery_address,
+      notes,
+      created_at,
+      user_id,
+      users(name, phone),
+      order_items (
+        id,
+        quantity,
+        price,
+        products(name)
+      )
+    `)
     .order("created_at", { ascending: false })
 
-  if (params.status) {
-    query = query.eq("status", params.status)
-  }
+  if (params.status) query = query.eq("status", params.status)
 
   const { data: orders } = await query
 
-  // Get order counts by status
+  // Contar pedidos por estado
   const { data: statusCounts } = await supabase.from("orders").select("status")
-
   const counts = statusCounts?.reduce(
     (acc, order) => {
       acc[order.status] = (acc[order.status] || 0) + 1
       return acc
     },
-    {} as Record<string, number>,
+    {} as Record<string, number>
   )
 
   return (
     <div className="min-h-screen bg-background">
       <EmployeeHeader />
-      <main className="container px-8 py-8">
+      <main className="container mx-auto px-8 py-8 max-w-5xl">
+        {/* Encabezado */}
         <div className="mb-6">
           <h1 className="text-xl md:text-3xl font-bold mb-2">Gestión de Pedidos</h1>
-          <p className="text-sm md:text-base text-muted-foreground">Administra y actualiza el estado de los pedidos</p>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Administra y actualiza el estado de los pedidos
+          </p>
         </div>
 
+        {/* Filtros por estado */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           {Object.entries(statusLabels).map(([status, label]) => (
             <a
               key={status}
-              href={params.status === status ? "/empleado/pedidos" : `/empleado/pedidos?status=${status}`}
+              href={
+                params.status === status
+                  ? "/empleado/pedidos"
+                  : `/empleado/pedidos?status=${status}`
+              }
               className={`p-4 rounded-lg border text-center hover:bg-accent transition-colors ${
                 params.status === status ? "bg-accent" : ""
               }`}
@@ -94,6 +116,7 @@ export default async function EmployeeOrdersPage({
           ))}
         </div>
 
+        {/* Buscador */}
         <div className="mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -101,70 +124,80 @@ export default async function EmployeeOrdersPage({
           </div>
         </div>
 
+        {/* Lista de pedidos */}
         {orders && orders.length > 0 ? (
           <div className="space-y-4">
-            {orders.map((order) => (
-              <Card key={order.id}>
-                <CardHeader>
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <CardTitle className="text-lg">Pedido #{order.id.slice(0, 8)}</CardTitle>
-                      <p className="text-sm text-muted-foreground">
-                        Cliente: {order.users.name} - {order.users.phone}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(order.created_at).toLocaleDateString("es-MX", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      <Badge className={statusColors[order.status as keyof typeof statusColors]}>
-                        {statusLabels[order.status as keyof typeof statusLabels]}
-                      </Badge>
-                      <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm">Productos:</h4>
-                    {order.order_items.map((item: any) => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span>
-                          {item.products.name} x {item.quantity}
-                        </span>
-                        <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+            {orders.map((order) => {
+              const cliente = order.users as unknown as { name: string | null; phone: string | null }
+              return (
+                <Card key={order.id}>
+                  <CardHeader>
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                      <div className="space-y-1">
+                        <CardTitle className="text-lg">
+                          Pedido #{order.id.slice(0, 8)}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Cliente: {cliente?.name || "Desconocido"} - {cliente?.phone || "N/A"}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(order.created_at).toLocaleDateString("es-MX", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                  <div className="border-t pt-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Método de pago</span>
-                      <span className="capitalize">{order.payment_method}</span>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <Badge className={statusColors[order.status as keyof typeof statusColors]}>
+                          {statusLabels[order.status as keyof typeof statusLabels]}
+                        </Badge>
+                        <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Dirección de entrega</span>
-                      <span className="text-right max-w-xs">{order.delivery_address}</span>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Productos:</h4>
+                      {order.order_items.map((item: any) => (
+                        <div key={item.id} className="flex justify-between text-sm">
+                          <span>
+                            {item.products.name} x {item.quantity}
+                          </span>
+                          <span className="font-medium">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                    {order.notes && (
+
+                    <div className="border-t pt-4 space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Notas</span>
-                        <span className="text-right max-w-xs">{order.notes}</span>
+                        <span className="text-muted-foreground">Método de pago</span>
+                        <span className="capitalize">{order.payment_method}</span>
                       </div>
-                    )}
-                    <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                      <span>Total</span>
-                      <span>${order.total.toFixed(2)}</span>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Dirección de entrega</span>
+                        <span className="text-right max-w-xs">{order.delivery_address}</span>
+                      </div>
+                      {order.notes && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Notas</span>
+                          <span className="text-right max-w-xs">{order.notes}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-bold text-lg pt-2 border-t">
+                        <span>Total</span>
+                        <span>${order.total.toFixed(2)}</span>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
@@ -175,3 +208,4 @@ export default async function EmployeeOrdersPage({
     </div>
   )
 }
+

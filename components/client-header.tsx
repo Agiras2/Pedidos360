@@ -1,17 +1,18 @@
 "use client"
 
-import { ShoppingCart, User, LogOut } from "lucide-react"
+import { ShoppingCart, User, LogOut, Settings } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/lib/cart-context"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 
 export function ClientHeader() {
   const { totalItems } = useCart()
   const router = useRouter()
+  const pathname = usePathname()
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -22,6 +23,7 @@ export function ClientHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 md:px-8">
+        {/* Logo */}
         <Link href="/catalogo" className="flex items-center">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo_Mesa%20de%20trabajo%201-bxNcZNFyYuv2mli5Rd8rVFkOHArcNd.png"
@@ -33,24 +35,38 @@ export function ClientHeader() {
           />
         </Link>
 
+        {/* Navegación */}
         <nav className="flex items-center gap-4 md:gap-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/mis-pedidos">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Mis Pedidos</span>
+          {/* Mis Pedidos */}
+          <Button variant={pathname === "/mis-pedidos" ? "default" : "ghost"} asChild>
+            <Link href="/mis-pedidos" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Mis Pedidos
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" asChild className="relative">
-            <Link href="/carrito">
-              <ShoppingCart className="h-5 w-5" />
+
+          {/* Perfil */}
+          <Button variant={pathname === "/perfil" ? "default" : "ghost"} asChild>
+            <Link href="/perfil" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Perfil
+            </Link>
+          </Button>
+
+          {/* Carrito */}
+          <Button variant={pathname === "/carrito" ? "default" : "ghost"} asChild className="relative">
+            <Link href="/carrito" className="flex items-center gap-2">
+              <ShoppingCart className="h-4 w-4" />
+              Carrito
               {totalItems > 0 && (
                 <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center">
                   {totalItems}
                 </Badge>
               )}
-              <span className="sr-only">Carrito</span>
             </Link>
           </Button>
+
+          {/* Logout */}
           <Button variant="ghost" size="icon" onClick={handleLogout}>
             <LogOut className="h-5 w-5" />
             <span className="sr-only">Cerrar Sesión</span>

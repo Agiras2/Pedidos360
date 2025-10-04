@@ -42,21 +42,31 @@ export default async function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-background">
       <ClientHeader />
-      <main className="container py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Mis Pedidos</h1>
-          <p className="text-muted-foreground">Historial y estado de tus pedidos</p>
+      <main className="px-8 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Mis Pedidos</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
+            Historial y estado de tus pedidos
+          </p>
         </div>
 
         {orders && orders.length > 0 ? (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {orders.map((order) => (
-              <Card key={order.id}>
+              <Card key={order.id} className="shadow-md">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <CardTitle className="text-lg">Pedido #{order.id.slice(0, 8)}</CardTitle>
-                    <Badge className={statusColors[order.status as keyof typeof statusColors]}>
-                      {statusLabels[order.status as keyof typeof statusLabels]}
+                    <CardTitle className="text-lg">
+                      Pedido #{order.id.slice(0, 8)}
+                    </CardTitle>
+                    <Badge
+                      className={
+                        statusColors[order.status as keyof typeof statusColors]
+                      }
+                    >
+                      {statusLabels[
+                        order.status as keyof typeof statusLabels
+                      ]}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
@@ -72,27 +82,42 @@ export default async function MyOrdersPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     {order.order_items.map((item: any) => (
-                      <div key={item.id} className="flex justify-between text-sm">
+                      <div
+                        key={item.id}
+                        className="flex justify-between text-sm"
+                      >
                         <span>
                           {item.products.name} x {item.quantity}
                         </span>
-                        <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </span>
                       </div>
                     ))}
                   </div>
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Método de pago</span>
-                      <span className="capitalize">{order.payment_method}</span>
+                      <span className="text-muted-foreground">
+                        Método de pago
+                      </span>
+                      <span className="capitalize">
+                        {order.payment_method}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Dirección de entrega</span>
-                      <span className="text-right max-w-xs">{order.delivery_address}</span>
+                      <span className="text-muted-foreground">
+                        Dirección de entrega
+                      </span>
+                      <span className="text-right max-w-xs">
+                        {order.delivery_address}
+                      </span>
                     </div>
                     {order.notes && (
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Notas</span>
-                        <span className="text-right max-w-xs">{order.notes}</span>
+                        <span className="text-right max-w-xs">
+                          {order.notes}
+                        </span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg pt-2 border-t">
@@ -105,10 +130,12 @@ export default async function MyOrdersPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 gap-4">
+          <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
             <Package className="h-16 w-16 text-muted-foreground" />
             <h2 className="text-2xl font-bold">No tienes pedidos</h2>
-            <p className="text-muted-foreground">Realiza tu primer pedido desde el catálogo</p>
+            <p className="text-muted-foreground">
+              Realiza tu primer pedido desde el catálogo
+            </p>
           </div>
         )}
       </main>

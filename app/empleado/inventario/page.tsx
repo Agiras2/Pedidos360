@@ -26,30 +26,21 @@ export default async function EmployeeInventoryPage({
 
   // Check if user is employee
   const { data: userData } = await supabase.from("users").select("role").eq("id", user.id).single()
-
   if (userData?.role !== "employee") {
     redirect("/catalogo")
   }
 
   // Fetch products
   let query = supabase.from("products").select("*").order("name")
-
-  if (params.q) {
-    query = query.ilike("name", `%${params.q}%`)
-  }
-
-  if (params.categoria) {
-    query = query.eq("category", params.categoria)
-  }
-
+  if (params.q) query = query.ilike("name", `%${params.q}%`)
+  if (params.categoria) query = query.eq("category", params.categoria)
   const { data: products } = await query
 
   // Get unique categories
   const { data: categories } = await supabase.from("products").select("category").not("category", "is", null)
-
   const uniqueCategories = [...new Set(categories?.map((c) => c.category) || [])]
 
-  // Get inventory stats
+  // Inventory stats
   const totalProducts = products?.length || 0
   const lowStock = products?.filter((p) => p.stock < 10).length || 0
   const outOfStock = products?.filter((p) => p.stock === 0).length || 0
@@ -57,58 +48,51 @@ export default async function EmployeeInventoryPage({
   return (
     <div className="min-h-screen bg-background">
       <EmployeeHeader />
-      <main className="container px-8 py-8">
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <main className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Encabezado */}
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-center sm:text-left">
           <div>
-            <h1 className="text-xl md:text-3xl font-bold mb-2">Gestión de Inventario</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Gestión de Inventario</h1>
             <p className="text-sm md:text-base text-muted-foreground">Administra productos y stock</p>
           </div>
-          <ProductFormDialog mode="create" />
+          <div className="mx-auto sm:mx-0">
+            <ProductFormDialog mode="create" />
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Productos</p>
-                  <p className="text-2xl font-bold">{totalProducts}</p>
-                </div>
-                <Package className="h-8 w-8 text-muted-foreground" />
-              </div>
+        {/* Stats cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6 justify-items-center">
+          <Card className="w-full sm:w-64">
+            <CardContent className="p-6 flex flex-col items-center">
+              <Package className="h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">Total Productos</p>
+              <p className="text-2xl font-bold">{totalProducts}</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Stock Bajo</p>
-                  <p className="text-2xl font-bold text-yellow-500">{lowStock}</p>
-                </div>
-                <Package className="h-8 w-8 text-yellow-500" />
-              </div>
+          <Card className="w-full sm:w-64">
+            <CardContent className="p-6 flex flex-col items-center">
+              <Package className="h-8 w-8 text-yellow-500 mb-2" />
+              <p className="text-sm text-muted-foreground">Stock Bajo</p>
+              <p className="text-2xl font-bold text-yellow-500">{lowStock}</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Sin Stock</p>
-                  <p className="text-2xl font-bold text-red-500">{outOfStock}</p>
-                </div>
-                <Package className="h-8 w-8 text-red-500" />
-              </div>
+          <Card className="w-full sm:w-64">
+            <CardContent className="p-6 flex flex-col items-center">
+              <Package className="h-8 w-8 text-red-500 mb-2" />
+              <p className="text-sm text-muted-foreground">Sin Stock</p>
+              <p className="text-2xl font-bold text-red-500">{outOfStock}</p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+        {/* Filtros y buscador */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-center gap-4 text-center sm:text-left">
+          <div className="relative flex-1 max-w-lg mx-auto sm:mx-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Buscar productos..." className="pl-9" />
           </div>
           {uniqueCategories.length > 0 && (
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
               {uniqueCategories.map((category) => (
                 <a
                   key={category}
@@ -130,12 +114,13 @@ export default async function EmployeeInventoryPage({
           )}
         </div>
 
+        {/* Lista de productos */}
         {products && products.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-6 flex flex-col items-center">
             {products.map((product) => (
-              <Card key={product.id}>
+              <Card key={product.id} className="w-full sm:w-4/5 lg:w-full">
                 <CardContent className="p-4">
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
                     <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md bg-muted">
                       <Image
                         src={product.image || "/placeholder.svg?height=96&width=96&query=product"}
@@ -144,16 +129,16 @@ export default async function EmployeeInventoryPage({
                         className="object-cover"
                       />
                     </div>
-                    <div className="flex-1 flex flex-col sm:flex-row justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-2 mb-1">
+                    <div className="flex-1 flex flex-col sm:flex-row justify-between gap-4 w-full">
+                      <div className="flex-1 text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1 justify-center sm:justify-start">
                           <h3 className="font-semibold text-lg">{product.name}</h3>
                           {product.category && <Badge variant="outline">{product.category}</Badge>}
                         </div>
                         {product.description && (
                           <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{product.description}</p>
                         )}
-                        <div className="flex flex-wrap gap-4 text-sm">
+                        <div className="flex flex-wrap gap-4 justify-center sm:justify-start text-sm">
                           <div>
                             <span className="text-muted-foreground">Precio: </span>
                             <span className="font-bold">${product.price.toFixed(2)}</span>
@@ -165,8 +150,8 @@ export default async function EmployeeInventoryPage({
                                 product.stock === 0
                                   ? "text-red-500"
                                   : product.stock < 10
-                                    ? "text-yellow-500"
-                                    : "text-green-500"
+                                  ? "text-yellow-500"
+                                  : "text-green-500"
                               }`}
                             >
                               {product.stock} unidades
@@ -174,7 +159,7 @@ export default async function EmployeeInventoryPage({
                           </div>
                         </div>
                       </div>
-                      <div className="flex sm:flex-col gap-2">
+                      <div className="flex sm:flex-col gap-2 mt-2 sm:mt-0 justify-center sm:justify-start">
                         <ProductFormDialog mode="edit" product={product} />
                         <DeleteProductDialog productId={product.id} productName={product.name} />
                       </div>

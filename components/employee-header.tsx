@@ -1,6 +1,6 @@
 "use client"
 
-import { Package, Box, LogOut } from "lucide-react"
+import { Package, Box, FileText, LogOut } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,7 @@ export function EmployeeHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 md:px-8">
+        {/* Logo */}
         <Link href="/empleado/pedidos" className="flex items-center">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo_Mesa%20de%20trabajo%201-bxNcZNFyYuv2mli5Rd8rVFkOHArcNd.png"
@@ -31,19 +32,30 @@ export function EmployeeHeader() {
           />
         </Link>
 
+        {/* Navegación */}
         <nav className="flex items-center gap-4 md:gap-6">
           <Button variant={pathname === "/empleado/pedidos" ? "default" : "ghost"} asChild>
-            <Link href="/empleado/pedidos">
-              <Package className="mr-2 h-4 w-4" />
+            <Link href="/empleado/pedidos" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
               Pedidos
             </Link>
           </Button>
+
           <Button variant={pathname === "/empleado/inventario" ? "default" : "ghost"} asChild>
-            <Link href="/empleado/inventario">
-              <Box className="mr-2 h-4 w-4" />
+            <Link href="/empleado/inventario" className="flex items-center gap-2">
+              <Box className="h-4 w-4" />
               Inventario
             </Link>
           </Button>
+
+          <Button variant={pathname === "/empleado/reportes" ? "default" : "ghost"} asChild>
+            <Link href="/empleado/reportes" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Reportes
+            </Link>
+          </Button>
+
+          {/* Logout */}
           <Button variant="ghost" size="icon" onClick={handleLogout}>
             <LogOut className="h-5 w-5" />
             <span className="sr-only">Cerrar Sesión</span>
@@ -53,4 +65,3 @@ export function EmployeeHeader() {
     </header>
   )
 }
-
