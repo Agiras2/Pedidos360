@@ -1,10 +1,10 @@
+// app/historial-pedidos/page.tsx
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { ClientHeader } from "@/components/client-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Package } from "lucide-react"
-import { CancelOrderButton } from "@/components/cancel-order-button"
 
 const statusColors = {
   pending: "bg-yellow-500",
@@ -24,20 +24,21 @@ const statusLabels = {
   cancelled: "Cancelado",
 }
 
-
-
-export default async function MyOrdersPage() {
+export default async function HistorialPedidosPage() {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   if (!user) redirect("/auth/login")
 
+  // Traer solo pedidos entregados (historial)
   const { data: orders } = await supabase
     .from("orders")
     .select("*, order_items(*, products(name))")
     .eq("user_id", user.id)
-    .neq("status", "delivered")   // opcional: si no quieres entregados
-    .neq("status", "cancelled")   // excluye los pedidos cancelados
+    .in("status", ["delivered", "cancelled"])  // Trae entregados y cancelados
     .order("created_at", { ascending: false })
 
   return (
@@ -45,9 +46,9 @@ export default async function MyOrdersPage() {
       <ClientHeader />
       <main className="px-8 py-8">
         <div className="mb-8 text-center">
-          <h1 className="text-xl md:text-3xl font-bold mb-2">Mis Pedidos</h1>
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Historial de Pedidos</h1>
           <p className="text-sm md:text-base text-muted-foreground">
-            Historial y estado de tus pedidos
+            Aquí se muestran todos los pedidos que han sido entregados
           </p>
         </div>
 
@@ -72,7 +73,6 @@ export default async function MyOrdersPage() {
                     })}
                   </p>
                 </CardHeader>
-
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     {order.order_items.map((item: any) => (
@@ -102,16 +102,6 @@ export default async function MyOrdersPage() {
                       <span>Total</span>
                       <span>${order.total.toFixed(2)}</span>
                     </div>
-
-                    {/* Botón de cancelar pedido */}
-                    {["pending", "confirmed", "preparing", "ready"].includes(order.status) && (
-                      <div className="mt-2 text-center">
-                        <CancelOrderButton
-                          orderId={order.id}
-                          cancelSolicitude={order.cancel_solicitude}
-                        />
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -120,8 +110,10 @@ export default async function MyOrdersPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
             <Package className="h-16 w-16 text-muted-foreground" />
-            <h2 className="text-2xl font-bold">No tienes pedidos</h2>
-            <p className="text-muted-foreground">Realiza tu primer pedido desde el catálogo</p>
+            <h2 className="text-2xl font-bold">No hay pedidos entregados</h2>
+            <p className="text-muted-foreground">
+              Los pedidos aparecerán aquí una vez que sean entregados
+            </p>
           </div>
         )}
       </main>

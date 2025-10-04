@@ -1,6 +1,6 @@
 "use client"
 
-import { ShoppingCart, User, LogOut, Settings } from "lucide-react"
+import { ShoppingCart, User, LogOut, Settings, Package } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -42,6 +42,14 @@ export function ClientHeader() {
             <Link href="/mis-pedidos" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Mis Pedidos
+            </Link>
+          </Button>
+
+          {/* Historial */}
+          <Button variant={pathname === "/historial-pedidos" ? "default" : "ghost"} asChild>
+            <Link href="/historial-pedidos" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Historial
             </Link>
           </Button>
 

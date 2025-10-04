@@ -3,9 +3,6 @@ import { redirect } from "next/navigation"
 import { EmployeeHeader } from "@/components/employee-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { OrderStatusSelect } from "@/components/order-status-select"
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
 
 const statusColors = {
   pending: "bg-yellow-500",
@@ -25,18 +22,13 @@ const statusLabels = {
   cancelled: "Cancelado",
 }
 
-export default async function EmployeeOrdersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ status?: string; q?: string }>
-}) {
+export default async function EmployeeHistorialPedidosPage() {
   const supabase = await createClient()
-  const params = await searchParams
 
-  // Usuario autenticado
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
   if (!user) redirect("/auth/login")
 
   // Verificar rol empleado
@@ -48,8 +40,8 @@ export default async function EmployeeOrdersPage({
 
   if (userData?.role !== "employee") redirect("/catalogo")
 
-  // Consulta de pedidos excluyendo "delivered" y "cancelled"
-  let query = supabase
+  // Traer solo pedidos entregados o cancelados
+  const { data: orders } = await supabase
     .from("orders")
     .select(`
       id,
@@ -60,7 +52,6 @@ export default async function EmployeeOrdersPage({
       notes,
       created_at,
       user_id,
-      cancel_solicitude,
       users(name, phone),
       order_items (
         id,
@@ -69,70 +60,20 @@ export default async function EmployeeOrdersPage({
         products(name)
       )
     `)
-    .neq("status", "delivered")
-    .neq("status", "cancelled")
+    .in("status", ["delivered", "cancelled"])
     .order("created_at", { ascending: false })
-
-  if (params.status) query = query.eq("status", params.status)
-
-  const { data: orders } = await query
-
-  // Contar pedidos por estado excluyendo delivered y cancelled
-  const { data: statusCounts } = await supabase
-    .from("orders")
-    .select("status")
-    .neq("status", "delivered")
-    .neq("status", "cancelled")
-
-  const counts = statusCounts?.reduce(
-    (acc, order) => {
-      acc[order.status] = (acc[order.status] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>
-  )
 
   return (
     <div className="min-h-screen bg-background">
       <EmployeeHeader />
       <main className="container mx-auto px-8 py-8 max-w-5xl">
-        {/* Encabezado */}
         <div className="mb-6">
-          <h1 className="text-xl md:text-3xl font-bold mb-2">Gestión de Pedidos</h1>
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Historial de Pedidos</h1>
           <p className="text-sm md:text-base text-muted-foreground">
-            Administra y actualiza el estado de los pedidos
+            Aquí se muestran todos los pedidos entregados o cancelados
           </p>
         </div>
 
-        {/* Filtros por estado */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-          {Object.entries(statusLabels).map(([status, label]) => (
-            <a
-              key={status}
-              href={
-                params.status === status
-                  ? "/empleado/pedidos"
-                  : `/empleado/pedidos?status=${status}`
-              }
-              className={`p-4 rounded-lg border text-center hover:bg-accent transition-colors ${
-                params.status === status ? "bg-accent" : ""
-              }`}
-            >
-              <p className="text-2xl font-bold">{counts?.[status] || 0}</p>
-              <p className="text-sm text-muted-foreground">{label}</p>
-            </a>
-          ))}
-        </div>
-
-        {/* Buscador */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar por número de pedido o cliente..." className="pl-9" />
-          </div>
-        </div>
-
-        {/* Lista de pedidos */}
         {orders && orders.length > 0 ? (
           <div className="space-y-4">
             {orders.map((order) => {
@@ -160,15 +101,6 @@ export default async function EmployeeOrdersPage({
                         <Badge className={statusColors[order.status as keyof typeof statusColors]}>
                           {statusLabels[order.status as keyof typeof statusLabels]}
                         </Badge>
-
-                        {/* Badge para solicitud de cancelación */}
-                        {order.cancel_solicitude && (
-                          <Badge variant="outline" className="bg-yellow-200 text-yellow-800">
-                            Solicitud de cancelación enviada
-                          </Badge>
-                        )}
-
-                        <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
                       </div>
                     </div>
                   </CardHeader>
@@ -211,11 +143,10 @@ export default async function EmployeeOrdersPage({
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No se encontraron pedidos</p>
+            <p className="text-muted-foreground">No se encontraron pedidos en historial</p>
           </div>
         )}
       </main>
     </div>
   )
 }
-

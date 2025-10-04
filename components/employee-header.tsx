@@ -1,6 +1,6 @@
 "use client"
 
-import { Package, Box, FileText, LogOut } from "lucide-react"
+import { Package, Box, FileText, LogOut, Clock } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -38,6 +38,13 @@ export function EmployeeHeader() {
             <Link href="/empleado/pedidos" className="flex items-center gap-2">
               <Package className="h-4 w-4" />
               Pedidos
+            </Link>
+          </Button>
+
+          <Button variant={pathname === "/empleado/historial-pedidos" ? "default" : "ghost"} asChild>
+            <Link href="/empleado/historial-pedidos" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Historial
             </Link>
           </Button>
 
