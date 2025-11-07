@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { ClientHeader } from "@/components/client-header"
 import { ProductCard } from "@/components/product-card"
-import { SearchInput } from "@/components/search-input" // 👈 Importar el nuevo componente
+import { SearchInput } from "@/components/search-input"
 
 export default async function CatalogPage({
   searchParams,
@@ -15,18 +15,17 @@ export default async function CatalogPage({
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  
   if (!user) {
     redirect("/auth/login")
   }
 
-  // Get user role
   const { data: userData } = await supabase.from("users").select("role").eq("id", user.id).single()
 
   if (userData?.role === "employee") {
     redirect("/empleado/pedidos")
   }
 
-  // Fetch products
   let query = supabase.from("products").select("*").order("name")
 
   if (params.q) {
@@ -39,7 +38,6 @@ export default async function CatalogPage({
 
   const { data: products } = await query
 
-  // Get unique categories
   const { data: categories } = await supabase.from("products").select("category").not("category", "is", null)
 
   const uniqueCategories = [...new Set(categories?.map((c) => c.category) || [])]
@@ -54,10 +52,47 @@ export default async function CatalogPage({
         </div>
 
         <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          {/* 👇 Reemplazar el Input con SearchInput */}
           <SearchInput />
+          {uniqueCategories.length > 0 && (
+            <div className="flex gap-2 flex-wrap">
+              {uniqueCategories.map((category) => (
+                <a
+                  key={category}
+                  href={`/catalogo?categoria=${encodeURIComponent(category)}`}
+
+                  className="px-4 py-2 rounded-md border bg-background hover:bg-accent text-sm"
+                >
+                  {category}
+                </a>
+              ))}
+              {params.categoria && (
+                <a href="/catalogo" className="px-4 py-2 rounded-md border bg-primary text-primary-foreground text-sm">
+                  Ver Todos
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
+        {products && products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                image={product.image}
+                stock={product.stock}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No se encontraron productos</p>
+          </div>
+        )}
       </main>
     </div>
   )
