@@ -2,11 +2,11 @@ import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { EmployeeHeader } from "@/components/employee-header"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { InventorySearchInput } from "@/components/inventory-search-input"
 import { Badge } from "@/components/ui/badge"
 import { ProductFormDialog } from "@/components/product-form-dialog"
 import { DeleteProductDialog } from "@/components/delete-product-dialog"
-import { Search, Package } from "lucide-react"
+import { Package } from "lucide-react"
 import Image from "next/image"
 
 export default async function EmployeeInventoryPage({
@@ -85,18 +85,15 @@ export default async function EmployeeInventoryPage({
           </Card>
         </div>
 
-        {/* Filtros y buscador */}
+       {/* Filtros y buscador */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-center gap-4 text-center sm:text-left">
-          <div className="relative flex-1 max-w-lg mx-auto sm:mx-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar productos..." className="pl-9" />
-          </div>
+          <InventorySearchInput />
           {uniqueCategories.length > 0 && (
             <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
               {uniqueCategories.map((category) => (
                 <a
                   key={category}
-                  href={`/empleado/inventario?categoria=${category}`}
+                  href={`/empleado/inventario?categoria=${encodeURIComponent(category)}`}
                   className="px-4 py-2 rounded-md border bg-background hover:bg-accent text-sm"
                 >
                   {category}

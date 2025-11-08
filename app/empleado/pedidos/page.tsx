@@ -4,8 +4,7 @@ import { EmployeeHeader } from "@/components/employee-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusSelect } from "@/components/order-status-select"
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { OrderSearchInput } from "@/components/order-search-input"
 
 const statusColors = {
   pending: "bg-yellow-500",
@@ -49,7 +48,7 @@ export default async function EmployeeOrdersPage({
   if (userData?.role !== "employee") redirect("/catalogo")
 
   // Consulta de pedidos excluyendo "delivered" y "cancelled"
-  let query = supabase
+  const { data: allOrders } = await supabase
     .from("orders")
     .select(`
       id,
@@ -73,9 +72,30 @@ export default async function EmployeeOrdersPage({
     .neq("status", "cancelled")
     .order("created_at", { ascending: false })
 
-  if (params.status) query = query.eq("status", params.status)
+  // Filtrar por estado y búsqueda en memoria
+  let orders = allOrders || []
 
-  const { data: orders } = await query
+  if (params.status) {
+    orders = orders.filter(order => order.status === params.status)
+  }
+
+  if (params.q) {
+    const searchTerm = params.q.toLowerCase().trim()
+    orders = orders.filter((order) => {
+      const cliente = order.users as unknown as { name: string | null }
+      const clienteName = cliente?.name?.toLowerCase() || ""
+      const orderId = order.id.toLowerCase()
+      const orderIdShort = order.id.slice(0, 8).toLowerCase()
+      const address = order.delivery_address?.toLowerCase() || ""
+      
+      return (
+        orderId.includes(searchTerm) ||
+        orderIdShort.includes(searchTerm) ||
+        clienteName.includes(searchTerm) ||
+        address.includes(searchTerm)
+      )
+    })
+  }
 
   // Contar pedidos por estado excluyendo delivered y cancelled
   const { data: statusCounts } = await supabase
@@ -126,10 +146,7 @@ export default async function EmployeeOrdersPage({
 
         {/* Buscador */}
         <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Buscar por número de pedido o cliente..." className="pl-9" />
-          </div>
+          <OrderSearchInput />
         </div>
 
         {/* Lista de pedidos */}
@@ -218,4 +235,3 @@ export default async function EmployeeOrdersPage({
     </div>
   )
 }
-
