@@ -31,17 +31,32 @@ export default function LoginPage() {
       })
       if (error) throw error
 
-      // Get user role to redirect appropriately
-      const { data: userData } = await supabase
+      const { data: user } = await supabase.auth.getUser()
+      
+      if (!user.user?.id) {
+        throw new Error("No se pudo obtener el usuario")
+      }
+
+      const { data: userData, error: userError } = await supabase
         .from("users")
         .select("role")
-        .eq("id", (await supabase.auth.getUser()).data.user?.id)
+        .eq("id", user.user.id)
         .single()
 
-      if (userData?.role === "employee") {
-        router.push("/empleado/pedidos")
-      } else {
-        router.push("/catalogo")
+      if (userError) throw userError
+
+      // Redirect based on role
+      switch (userData?.role) {
+        case "admin":
+          router.push("/admin/master")
+          break
+        case "employee":
+          router.push("/empleado/pedidos")
+          break
+        case "client":
+        default:
+          router.push("/catalogo")
+          break
       }
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Ocurrió un error")

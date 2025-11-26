@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { EmployeeHeader } from "@/components/employee-header"
+import { AdminHeader } from "@/components/admin-header" // <--- Importante: Importar el header de admin
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { OrderStatusSelect } from "@/components/order-status-select"
@@ -32,22 +33,24 @@ export default async function EmployeeOrdersPage({
   const supabase = await createClient()
   const params = await searchParams
 
-  // Usuario autenticado
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect("/auth/login")
 
-  // Verificar rol empleado
+
   const { data: userData } = await supabase
     .from("users")
     .select("role")
     .eq("id", user.id)
     .single()
 
-  if (userData?.role !== "employee") redirect("/catalogo")
+  if (userData?.role !== "employee" && userData?.role !== "admin") {
+    redirect("/catalogo")
+  }
 
-  // Consulta de pedidos excluyendo "delivered" y "cancelled"
+
   const { data: allOrders } = await supabase
     .from("orders")
     .select(`
@@ -72,7 +75,7 @@ export default async function EmployeeOrdersPage({
     .neq("status", "cancelled")
     .order("created_at", { ascending: false })
 
-  // Filtrar por estado y búsqueda en memoria
+
   let orders = allOrders || []
 
   if (params.status) {
@@ -97,7 +100,7 @@ export default async function EmployeeOrdersPage({
     })
   }
 
-  // Contar pedidos por estado excluyendo delivered y cancelled
+
   const { data: statusCounts } = await supabase
     .from("orders")
     .select("status")
@@ -114,7 +117,9 @@ export default async function EmployeeOrdersPage({
 
   return (
     <div className="min-h-screen bg-background">
-      <EmployeeHeader />
+      {/*Mostrar Header correcto según el rol */}
+      {userData?.role === "admin" ? <AdminHeader /> : <EmployeeHeader />}
+      
       <main className="container mx-auto px-8 py-8 max-w-5xl">
         {/* Encabezado */}
         <div className="mb-6">
