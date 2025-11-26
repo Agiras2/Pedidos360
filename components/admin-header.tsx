@@ -1,6 +1,6 @@
 "use client"
 
-import { Package, Settings, LogOut } from "lucide-react"
+import { Package, Clock, Settings, LogOut } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ export function AdminHeader() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       <div className="flex h-16 items-center justify-between px-6 md:px-8">
-        {/* Logo - Redirige a Master por defecto ya que no hay Dashboard */}
+        {/* Logo */}
         <Link href="/admin/master" className="flex items-center">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Logo_Mesa%20de%20trabajo%201-bxNcZNFyYuv2mli5Rd8rVFkOHArcNd.png"
@@ -34,9 +34,9 @@ export function AdminHeader() {
 
         {/* Navegación */}
         <nav className="flex items-center gap-4 md:gap-6">
-          {/* Enlace a la vista de Pedidos (Ruta de empleado) */}
+          {/* Pedidos */}
           <Button 
-            variant={pathname.startsWith("/empleado/pedidos") ? "default" : "ghost"} 
+            variant={pathname === "/empleado/pedidos" ? "default" : "ghost"} 
             asChild
           >
             <Link href="/empleado/pedidos" className="flex items-center gap-2">
@@ -45,7 +45,18 @@ export function AdminHeader() {
             </Link>
           </Button>
 
-          {/* Enlace a Master */}
+          {/* Historial */}
+          <Button 
+            variant={pathname === "/empleado/historial-pedidos" ? "default" : "ghost"} 
+            asChild
+          >
+            <Link href="/empleado/historial-pedidos" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Historial
+            </Link>
+          </Button>
+
+          {/* Master */}
           <Button variant={pathname === "/admin/master" ? "default" : "ghost"} asChild>
             <Link href="/admin/master" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />

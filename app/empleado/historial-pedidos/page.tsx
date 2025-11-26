@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { EmployeeHeader } from "@/components/employee-header"
+import { AdminHeader } from "@/components/admin-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
@@ -31,14 +32,19 @@ export default async function EmployeeHistorialPedidosPage() {
 
   if (!user) redirect("/auth/login")
 
-  // Verificar rol empleado
+  // Verificar rol empleado o admin
   const { data: userData } = await supabase
     .from("users")
     .select("role")
     .eq("id", user.id)
     .single()
 
-  if (userData?.role !== "employee") redirect("/catalogo")
+  // Permitir acceso a empleados y admins
+  if (userData?.role !== "employee" && userData?.role !== "admin") {
+    redirect("/catalogo")
+  }
+
+  const isAdmin = userData?.role === "admin"
 
   // Traer solo pedidos entregados o cancelados
   const { data: orders } = await supabase
@@ -65,7 +71,7 @@ export default async function EmployeeHistorialPedidosPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <EmployeeHeader />
+      {isAdmin ? <AdminHeader /> : <EmployeeHeader />}
       <main className="container mx-auto px-8 py-8 max-w-5xl">
         <div className="mb-6">
           <h1 className="text-xl md:text-3xl font-bold mb-2">Historial de Pedidos</h1>
