@@ -15,17 +15,23 @@ export async function GET(req: NextRequest) {
       .select(`
         id,
         status,
-        users!orders_user_id_fkey(id,name)
+        created_at,
+        users:user_id(name)
       `)
       .order("created_at", { ascending: false })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    const report = orders?.map((o) => ({
-      PedidoID: o.id,
-      Cliente: o.users?.[0]?.name || "Desconocido",
-      Estado: o.status,
-    })) || []
+    const report = orders?.map((o) => {
+      // Forzar el tipo correcto
+      const user = o.users as unknown as { name: string } | null
+      return {
+        PedidoID: o.id,
+        Cliente: user?.name || "Desconocido",
+        Estado: o.status,
+        Fecha: new Date(o.created_at).toLocaleDateString("es-CO")
+      }
+    }) || []
 
     return NextResponse.json({ report, title: "Reporte de Pedidos (Todos los empleados)" })
   }
@@ -46,7 +52,7 @@ export async function GET(req: NextRequest) {
     const report = products?.map((p) => {
       const totalVendidos = p.order_items?.reduce((sum, item) => sum + item.quantity, 0) || 0
       return {
-        Producto: p.name,
+        Nombre: p.name,
         Stock: p.stock,
         "Cantidad Vendida": totalVendidos,
       }
@@ -63,6 +69,7 @@ export async function GET(req: NextRequest) {
         id,
         name,
         email,
+        created_at,
         orders(id)
       `)
       .eq("role", "client")
@@ -73,6 +80,7 @@ export async function GET(req: NextRequest) {
       Cliente: c.name,
       Email: c.email,
       "Cantidad de Pedidos": c.orders?.length || 0,
+      "Fecha de Registro": new Date(c.created_at).toLocaleDateString("es-CO")
     })) || []
 
     return NextResponse.json({ report, title: "Reporte de Clientes" })
