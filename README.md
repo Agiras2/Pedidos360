@@ -2,7 +2,7 @@
 
 Sistema web para la administración de pedidos, productos, usuarios y reportes. Desarrollado con Next.js 14, React, TypeScript, TailwindCSS y Supabase.
 
-**🌐 Aplicación en vivo:** [https://pedidos360.vercel.app](https://pedidos360.vercel.app)
+**🌐 Aplicación en vivo:** [https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
 
 ## 📋 Descripción del Proyecto
 
@@ -274,7 +274,7 @@ El sistema utiliza PostgreSQL a través de Supabase con las siguientes tablas pr
 2. Configurar variables de entorno en Vercel
 3. Deploy automático
 
-**Aplicación desplegada:** [https://pedidos360.vercel.app](https://pedidos360.vercel.app)
+**Aplicación desplegada:** ([https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
 
 ### Variables de entorno en producción:
 Asegúrate de agregar todas las variables del `.env.local` en la configuración de tu plataforma de deployment.
@@ -331,5 +331,6 @@ Este proyecto fue desarrollado como parte del curso de Análisis y Diseño 2 de 
 
 ---
 
-**Repositorio:** [GitHub](https://github.com/tu-usuario/pedidos360)  
-**Demo en vivo:** [https://pedidos360.vercel.app](https://pedidos360.vercel.app)
+**Repositorio:** [GitHub]([https://github.com/tu-usuario/pedidos360](https://github.com/Agiras2/Pedidos360.git))  
+**Demo en vivo:** [https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
+
