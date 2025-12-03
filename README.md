@@ -4,6 +4,33 @@ Sistema web para la administración de pedidos, productos, usuarios y reportes. 
 
 **🌐 Aplicación en vivo:** [https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
 
+## 🔑 Credenciales de Prueba
+
+Para facilitar la evaluación del sistema, se proporcionan las siguientes credenciales de acceso:
+
+### 👑 Administrador
+```
+Email: admin@gmail.com
+Contraseña: 12345
+```
+**Acceso a:** Panel Master, gestión de usuarios, productos, pedidos, reportes e historial.
+
+### 👔 Empleado
+```
+Email: carlos@gmail.com
+Contraseña: 12345
+```
+**Acceso a:** Gestión de pedidos, inventario, reportes e historial.
+
+### 🛒 Cliente
+```
+Email: pepe@gmail.com
+Contraseña: 12345
+```
+**Acceso a:** Catálogo de productos, creación de pedidos, seguimiento de pedidos.
+
+> ⚠️ **Nota:** Estas son credenciales de demostración. En producción, usar credenciales seguras.
+
 ## 📋 Descripción del Proyecto
 
 Pedidos360 es una aplicación web de administración que permite gestionar pedidos, productos, usuarios y generar reportes con visualizaciones gráficas. El sistema cuenta con tres roles de usuario diferenciados (Admin, Empleado y Cliente), cada uno con permisos y funcionalidades específicas.
@@ -333,4 +360,5 @@ Este proyecto fue desarrollado como parte del curso de Análisis y Diseño 2 de 
 
 **Repositorio:** [GitHub]([https://github.com/tu-usuario/pedidos360](https://github.com/Agiras2/Pedidos360.git))  
 **Demo en vivo:** [https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
+
 
