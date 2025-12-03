@@ -358,7 +358,8 @@ Este proyecto fue desarrollado como parte del curso de Análisis y Diseño 2 de 
 
 ---
 
-**Repositorio:** [GitHub]([https://github.com/tu-usuario/pedidos360](https://github.com/Agiras2/Pedidos360.git))  
+**Repositorio:** [https://github.com/tu-usuario/pedidos360](https://github.com/Agiras2/Pedidos360.git) 
 **Demo en vivo:** [https://pedidos360.vercel.app](https://pedidos360-ot8r5cpax-andresgiraldo19-3057s-projects.vercel.app/)
+
 
 
