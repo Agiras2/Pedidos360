@@ -2,7 +2,7 @@
 
 Sistema web para la administración de pedidos, productos, usuarios y reportes. Desarrollado con Next.js 14, React, TypeScript, TailwindCSS y Supabase.
 
-**🌐 Aplicación en vivo:** [https://pedidos360.vercel.app](https://pedidos360-9n2tsywvm-andresgiraldo19-3057s-projects.vercel.app/)
+**🌐 Aplicación en vivo:** [https://pedidos360.vercel.app](https://pedidos360-9n2tsywvm-andresgiraldo19-3057s-projects.vercel.app?_vercel_share=2AGMosRkcFy5gjqB7KxIUEbUgU3NmC7j)
 
 ## 🔑 Credenciales de Prueba
 
